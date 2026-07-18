@@ -1,5 +1,9 @@
 # PetClinicApp
 
+![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
+![Status](https://img.shields.io/badge/Status-WIP-orange)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 A Java console application for managing a pet clinic: booking appointments, registering pet owners, and searching records.
 
 ## Overview
