@@ -33,6 +33,7 @@ public class PetClinicApp {
             System.out.println("| 2) Register Pet Owner        |");
             System.out.println("| 3) Search Owner by Pet Name  |");
             System.out.println("| 4) Save Data to File         |");
+            System.out.println("| 5) List All Appointments     |");
             System.out.println("| 0) Exit                      |");
             System.out.println("+------------------------------+");
             System.out.print("Select an option: ");
@@ -53,6 +54,9 @@ public class PetClinicApp {
                     break;
                 case 4:
                     saveToFile();
+                    break;
+                case 5:
+                    listAppointments();
                     break;
                 default:
                     System.out.println("Invalid option. Try again.");
@@ -158,6 +162,19 @@ public class PetClinicApp {
 
         if (!found) {
             System.out.println("No owner found with a pet named " + searchName + ".");
+        }
+    }
+
+    public static void listAppointments() {
+        if (ownerCount == 0) {
+            System.out.println("No appointments booked yet.");
+            return;
+        }
+        System.out.println();
+        System.out.println("All booked appointments:");
+        System.out.println("--------------------------------");
+        for (int i = 0; i < ownerCount; i++) {
+            System.out.println((i + 1) + ". " + owners[i].toString());
         }
     }
 
