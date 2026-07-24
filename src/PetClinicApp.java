@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
@@ -18,7 +19,56 @@ public class PetClinicApp {
 
     public static void main(String[] args) {
         System.out.println("Welcome to the Pet Clinic App!");
+        loadFromFile();
         runMenu();
+    }
+
+    public static void loadFromFile() {
+        File file = new File("ClinicData.txt");
+        if (!file.exists()) {
+            return;
+        }
+
+        try (Scanner reader = new Scanner(file)) {
+            int loaded = 0;
+            while (reader.hasNextLine() && ownerCount < owners.length) {
+                String line = reader.nextLine().trim();
+                if (line.isEmpty()) continue;
+
+                // Expected format: "Owner: X | Pet: Y (Type) | Slot: N"
+                String[] parts = line.split(" \\| ");
+                if (parts.length != 3) continue;
+
+                try {
+                    String ownerName = parts[0].substring("Owner: ".length()).trim();
+                    String petFull = parts[1].substring("Pet: ".length()).trim();
+
+                    int openParen = petFull.lastIndexOf(" (");
+                    int closeParen = petFull.lastIndexOf(')');
+                    if (openParen < 0 || closeParen < 0 || closeParen <= openParen) continue;
+
+                    String petName = petFull.substring(0, openParen);
+                    String petType = petFull.substring(openParen + 2, closeParen);
+                    int slot = Integer.parseInt(parts[2].substring("Slot: ".length()).trim());
+
+                    owners[ownerCount++] = new PetOwner(ownerName, petName, petType, slot);
+
+                    // Rebuild slot state so the same slot cannot be double-booked
+                    int[] slots = getSlotsArrayByName(petType);
+                    if (slots != null && slot >= 1 && slot <= slots.length) {
+                        slots[slot - 1] = 1;
+                    }
+                    loaded++;
+                } catch (Exception ignore) {
+                    // Skip malformed lines instead of crashing on load
+                }
+            }
+            if (loaded > 0) {
+                System.out.println("Loaded " + loaded + " previous appointment(s) from ClinicData.txt");
+            }
+        } catch (IOException e) {
+            System.out.println("Could not read ClinicData.txt");
+        }
     }
 
     public static void runMenu() {
