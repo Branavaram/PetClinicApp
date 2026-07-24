@@ -34,6 +34,7 @@ public class PetClinicApp {
             System.out.println("| 3) Search Owner by Pet Name  |");
             System.out.println("| 4) Save Data to File         |");
             System.out.println("| 5) List All Appointments     |");
+            System.out.println("| 6) Cancel Appointment        |");
             System.out.println("| 0) Exit                      |");
             System.out.println("+------------------------------+");
             System.out.print("Select an option: ");
@@ -57,6 +58,9 @@ public class PetClinicApp {
                     break;
                 case 5:
                     listAppointments();
+                    break;
+                case 6:
+                    cancelAppointment();
                     break;
                 default:
                     System.out.println("Invalid option. Try again.");
@@ -188,6 +192,51 @@ public class PetClinicApp {
             System.out.println("Data saved to file.");
         } catch (IOException e) {
             System.out.println("Error writing to file.");
+        }
+    }
+
+    public static void cancelAppointment() {
+        if (ownerCount == 0) {
+            System.out.println("No appointments to cancel.");
+            return;
+        }
+
+        input.nextLine(); // Consume leftover newline from the menu selection
+        System.out.println("Enter the pet name to cancel appointment for:");
+        String searchName = input.nextLine();
+
+        for (int i = 0; i < ownerCount; i++) {
+            if (owners[i].getPetName().equalsIgnoreCase(searchName)) {
+                // Free the previously reserved slot
+                int[] slots = getSlotsArrayByName(owners[i].getPetType());
+                int slotIdx = owners[i].getSlotNumber() - 1;
+                if (slots != null && slotIdx >= 0 && slotIdx < slots.length) {
+                    slots[slotIdx] = 0;
+                }
+                // Shift remaining owners left so the array stays compact
+                for (int j = i; j < ownerCount - 1; j++) {
+                    owners[j] = owners[j + 1];
+                }
+                owners[ownerCount - 1] = null;
+                ownerCount--;
+                System.out.println("Appointment for " + searchName + " cancelled successfully.");
+                return;
+            }
+        }
+        System.out.println("No appointment found for pet named " + searchName + ".");
+    }
+
+    private static int[] getSlotsArrayByName(String petType) {
+        if (petType == null) return null;
+        switch (petType) {
+            case "Dog":
+                return dogSlots;
+            case "Cat":
+                return catSlots;
+            case "Rabbit":
+                return rabbitSlots;
+            default:
+                return null;
         }
     }
 
